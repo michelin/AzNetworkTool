@@ -1,7 +1,8 @@
 # AzNetworkTool CLI
 
 AzNetworkTool CLI extends [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) for operationnal needs.
-It help us to :
+
+This CLI helps us daily to:
 * Find to which of our Azure resource(s) belong an IP Address, whether public or private. *NIC, (I|E)LB, Redis & Public IPs supported*.
 * Find available subnets in a virtual network.
 * Find an address space when we to create a virtual Network that not overlap with existing virtual networks. Useful when we need to peer Virtual Networks.
@@ -67,7 +68,7 @@ Available ranges - processing in progress ...
 
 
 
-### Available Address Spaces that will not overlap with existing VNETs (mandatory for peering).
+### Available Address Spaces that will not overlap with existing VNETs
  * Get available VNET address spaces that will not overlap with existings. `10.224.0.0/24` is here the address range of an Azure Virtual Datacenter
 
 ```bash
