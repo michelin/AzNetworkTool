@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#set -e
+export BAGCLI_WORKDIR=$(cd $(dirname "$0") && pwd)
+
+cli_name=${0##*/}
+export cli_name
+
+cli_help() {
+
+  echo "
+$cli_name 
+Version: $(cat "$BAGCLI_WORKDIR"/VERSION)
+
+Usage: $cli_name [command]
+
+Commands:
+  what-is-this-ip                 Get Azure Resource associated to a public or private IP address.
+  vnet-available-subnets          Get available subnets inside a VNET
+  vnet-addrespace-wo-overlap      Get available VNET address spaces that will not overlap with existings
+  *                     Help
+"
+  exit 1
+}
+
+case "$1" in
+  what-is-this-ip|d)
+    "$BAGCLI_WORKDIR/commands/what-is-this-ip" "$2"
+    ;;
+  vnet-addrespace-wo-overlap|d)
+    "$BAGCLI_WORKDIR/commands/vnet-addrespace-wo-overlap" "$2"
+    ;;
+  vnet-available-subnets|d)
+    "$BAGCLI_WORKDIR/commands/vnet-available-subnets" "$2"
+    ;;
+  *)
+    cli_help
+    ;;
+esac

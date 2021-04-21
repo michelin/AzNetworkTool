@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -e
+
+cli_help_deploy() {
+  echo "
+Command: what-is-this-ip
+
+Usage: 
+  what-is-this-ip <IP_ADDRESS>"
+  exit 1
+}
+
+[ ! -n "$1" ] && cli_help_deploy
+
+export IP_ADDRESS=$1
+
+# Searching btw NICs, LBs, Redis, PublicIPs
+NICs=$(az graph query -q "Resources
+  | where type == 'microsoft.network/networkinterfaces'
+  | mv-expand ipConfigurations=properties.ipConfigurations
+  | mv-expand privateIPAddress=ipConfigurations.properties.privateIPAddress
+  | where privateIPAddress=='$IP_ADDRESS'" \
+  --query '[].[subscriptionId, resourceGroup, name, privateIPAddress]' \
+  -o tsv)
+
+[ ! -z "$NICs" ] && echo -e "\t-> NIC(s) found:\n$NICs" && exit 0
+
+LBs=$(az graph query -q "Resources
+  | where type == 'microsoft.network/loadbalancers'
+  | mv-expand frontendIPConfigurations=properties.frontendIPConfigurations
+  | mv-expand privateIPAddress=frontendIPConfigurations.properties.privateIPAddress
+  | where privateIPAddress=='$IP_ADDRESS'" \
+  --query '[].[subscriptionId, resourceGroup, name, privateIPAddress]' \
+  -o tsv)
+
+[ ! -z "$LBs" ] && echo -e "\t-> Load Balancer(s) found:\n$LBs" && exit 0
+
+Redis=$(az graph query -q "Resources
+  | where type == 'microsoft.cache/redis'
+  | where properties.staticIP=='$IP_ADDRESS'" \
+  --query '[].[subscriptionId, resourceGroup, name, properties.staticIP]' \
+  -o tsv)
+
+[ ! -z "$Redis" ] && echo -e "\t-> Redis found:\n$Redis" && exit 0
+
+PublicIPs=$(az graph query -q "Resources
+  | where type == 'microsoft.network/publicipaddresses'
+  | where properties.ipAddress=='$IP_ADDRESS'" \
+  --query '[].[subscriptionId, resourceGroup, name, properties.ipAddress]' \
+  -o tsv)
+
+[ ! -z "$PublicIPs" ] && echo -e "\t-> Public IP(s) found:\n$PublicIPs" && exit 0
+
+
+
+
+echo "IP not found!"

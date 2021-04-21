@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -e
+
+command_help() {
+  
+  echo "
+Command: vnet-available-subnets displays available subnets inside a virtualNetwork
+
+Usage: 
+  vnet-available-subnets <virtualNetworkResourceId>
+
+Example:
+  ./$cli_name vnet-available-subnets /subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/XXXXXXX/providers/Microsoft.Network/virtualNetworks/XXXXXXXXXXXXX"
+  exit 1
+}
+
+VNETRESOURCEID=$1
+
+
+
+VNETDetails=$(az graph query -q "Resources | where id == '$VNETRESOURCEID'")
+[ "$VNETDetails" = "[]" ] && echo "Error! VNET not found" && exit 1 
+
+VNETAddressSpaces=$(echo "$VNETDetails" | jq -r '.[] .properties.addressSpace.addressPrefixes[]') # Get VNET address space
+[ "$VNETAddressSpaces" = "[]" ] && echo "Error! VNET AddressSpace empty" && exit 1 
+VNETAddressSpaces=$(echo "$VNETAddressSpaces" | tr '\n' ',' | sed 's/.$//')
+
+VNETSubnetsRanges=$(echo "$VNETDetails" | jq -r '.[] .properties.subnets[].properties.addressPrefix') # Get VNET subnets address range
+[ "$VNETSubnetsRanges" = "[]" ] && echo "Error! VNET Subnets Range empty" && exit 1 
+VNETSubnetsRanges=$(echo "$VNETSubnetsRanges" | tr '\n' ',' | sed 's/.$//')
+
+
+echo "Available ranges - processing in progress ..."
+
+echo $(python3 $BAGCLI_WORKDIR/utils/CalculateAvailableSubnets.py "$VNETAddressSpaces" "$VNETSubnetsRanges")

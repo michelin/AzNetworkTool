@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -e
+
+command_help() {
+  
+  echo "
+Command: vnet-addrespace-wo-overlap displays available VNET address spaces that will not overlap with existings
+
+Usage: 
+  vnet-addrespace-wo-overlap <vDC_Range>
+
+Parameters:
+  <vDC_Range> CIDR format. Example: 10.224.0.0/16
+
+Example:
+  ./$cli_name available-ranges vnet-addrespace-wo-overlap 10.224.0.0/16"
+
+  exit 1
+}
+
+VDC_RANGE=$1
+
+[ -z "$VDC_RANGE" ] && command_help
+
+VNETsAddressSpaces=$(az graph query -q "Resources
+| where type == 'microsoft.network/virtualnetworks'
+| mv-expand properties.addressSpace.addressPrefixes
+| distinct tostring(properties_addressSpace_addressPrefixes)" \
+  --first 5000 -o tsv)
+
+VNETsAddressSpaces=$(echo "$VNETsAddressSpaces" | tr '\n' ',' | sed 's/.$//')
+
+
+echo "Available Address Spaces for Virtual Networks - processing in progress ..."
+echo $(python3 $BAGCLI_WORKDIR/utils/CalculateAvailableSubnets.py "$VDC_RANGE" "$VNETsAddressSpaces")
+
