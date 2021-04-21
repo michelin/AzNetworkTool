@@ -1,6 +1,10 @@
 # AzNetworkTool CLI
 
-AzNetworkTool CLI extends [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) with corporate features.
+AzNetworkTool CLI extends [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) for operationnal needs.
+It help us to :
+* Find to which of our Azure resource(s) belong an IP Address, whether public or private. *NIC, (I|E)LB, Redis & Public IPs supported*.
+* Find available subnets in a virtual network.
+* Find an address space when we to create a virtual Network that not overlap with existing virtual networks. Useful when we need to peer Virtual Networks.
 
 ## Installation
 
