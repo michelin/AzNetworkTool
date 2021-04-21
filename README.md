@@ -33,7 +33,7 @@ Commands:
   what-is-this-ip                 Get Azure Resource associated to a public or private IP address.
   vnet-available-subnets          Get available subnets inside a VNET
   vnet-addrespace-wo-overlap      Get available VNET address spaces that will not overlap with existings
-  *                     Help
+  *                               Help
 ```
 
 ### What Is This Ip
@@ -52,7 +52,7 @@ Commands:
 IP not found!
 ```
 
-### Available Subnets
+### Available Subnets inside a Virtual Network
  * Find available subnets inside a Virtual Network.
 
 ```bash
@@ -63,7 +63,7 @@ Available ranges - processing in progress ...
 
 
 
-### Available Ranges
+### Available Address Spaces that will not overlap with existing VNETs (mandatory for peering).
  * Get available VNET address spaces that will not overlap with existings. `10.224.0.0/24` is here the address range of an Azure Virtual Datacenter
 
 ```bash
